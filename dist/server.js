@@ -13,19 +13,25 @@ const PORT = 3000;
 app.use(express_1.default.static(path_1.default.join(__dirname, "public")));
 app.get("/api/info", async (_req, res) => {
     try {
-        const cpu = await systeminformation_1.default.cpu();
-        const mem = await systeminformation_1.default.mem();
-        const disk = await systeminformation_1.default.diskLayout();
-        const os = await systeminformation_1.default.osInfo();
+        const [cpu, mem, memLayout, disks, fs, os] = await Promise.all([
+            systeminformation_1.default.cpu(),
+            systeminformation_1.default.mem(),
+            systeminformation_1.default.memLayout(),
+            systeminformation_1.default.diskLayout(),
+            systeminformation_1.default.fsSize(),
+            systeminformation_1.default.osInfo(),
+        ]);
         const info = {
-            cpu: `${cpu.brand} (${cpu.speed} GHz, ${cpu.cores} cores)`,
-            memory: `${(mem.total / 1073741824).toFixed(2)} GB`,
-            storage: disk.map(d => `${d.name} ${d.size / 1073741824} GB`).join(", "),
-            os: `${os.distro} ${os.arch}`,
+            cpu,
+            memory: { total: mem.total, layout: memLayout },
+            disks,
+            filesystems: fs,
+            os,
         };
         res.json(info);
     }
     catch (error) {
+        console.error("Erro ao coletar informações:", error);
         res.status(500).json({ error: "Erro ao coletar informações da máquina" });
     }
 });

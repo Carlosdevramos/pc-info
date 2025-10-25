@@ -11,20 +11,26 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/info", async (_req, res) => {
   try {
-    const cpu = await si.cpu();
-    const mem = await si.mem();
-    const disk = await si.diskLayout();
-    const os = await si.osInfo();
+    const [cpu, mem, memLayout, disks, fs, os] = await Promise.all([
+      si.cpu(),
+      si.mem(),
+      si.memLayout(),
+      si.diskLayout(),
+      si.fsSize(),
+      si.osInfo(),
+    ]);
 
     const info = {
-      cpu: `${cpu.brand} (${cpu.speed} GHz, ${cpu.cores} cores)`,
-      memory: `${(mem.total / 1073741824).toFixed(2)} GB`,
-      storage: disk.map(d => `${d.name} ${d.size / 1073741824} GB`).join(", "),
-      os: `${os.distro} ${os.arch}`,
+      cpu,
+      memory: { total: mem.total, layout: memLayout },
+      disks,
+      filesystems: fs,
+      os,
     };
 
     res.json(info);
   } catch (error) {
+    console.error("Erro ao coletar informações:", error);
     res.status(500).json({ error: "Erro ao coletar informações da máquina" });
   }
 });
