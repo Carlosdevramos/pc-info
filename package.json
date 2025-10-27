@@ -3,13 +3,21 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-  "build:frontend": "tsc --project tsconfig.json --outDir dist --rootDir src",
-  "copy:public": "xcopy src\\public dist\\public /E /I /Y",
-  "build": "npm run build:frontend && npm run copy:public",
-  "start": "node dist/server.js",
-  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-  "package": "npm run build && pkg . --targets node18-win-x64 --output pc-info.exe"
-},
+    "build:frontend": "tsc --project tsconfig.json --outDir dist --rootDir src",
+    "copy:public": "xcopy src\\public dist\\public /E /I /Y",
+    "build": "npm run build:frontend && npm run copy:public",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "package": "npm run build && pkg . --targets node18-win-x64 --output pc-info.exe && xcopy dist\\public public /E /I /Y"
+  },
+  "pkg": {
+    "assets": [
+      "dist/public/**/*"
+    ],
+    "scripts": [
+      "dist/server.js"
+    ]
+  },
   "dependencies": {
     "express": "^4.21.2",
     "open": "^8.4.2",
