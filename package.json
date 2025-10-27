@@ -8,7 +8,7 @@
     "build": "npm run build:frontend && npm run copy:public",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "package": "npm run build && pkg . --targets node18-win-x64 --output pc-info.exe && xcopy dist\\public public /E /I /Y"
+    "package": "npm run build && pkg . --targets node18-win-x64 --output build/pc-info.exe"
   },
   "pkg": {
     "assets": [

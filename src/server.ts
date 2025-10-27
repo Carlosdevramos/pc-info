@@ -10,9 +10,7 @@ const PORT = 3000;
 const isPkg = typeof (process as any).pkg !== "undefined";
 
 // Caminho correto da pasta public (sem "dist" no modo .exe)
-const publicDir = isPkg
-  ? path.join(path.dirname(process.execPath), "public")
-  : path.join(__dirname, "public");
+const publicDir = path.join(__dirname, "public");
 
 app.use(express.static(publicDir));
 
