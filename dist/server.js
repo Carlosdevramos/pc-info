@@ -11,10 +11,13 @@ const app = (0, express_1.default)();
 const PORT = 3000;
 // Detecta se está rodando dentro de um executável pkg
 const isPkg = typeof process.pkg !== "undefined";
-// Caminho correto da pasta public (sem "dist" no modo .exe)
+// --- CORREÇÃO AQUI ---
+// No modo PKG, 'public' é acessado diretamente via __dirname, 
+// pois o PKG configura __dirname para apontar para a raiz dos assets virtuais.
+// Em modo DEV, __dirname aponta para 'dist', e 'public' está dentro de 'dist'.
 const publicDir = isPkg
-    ? path_1.default.join(path_1.default.dirname(process.execPath), "public")
-    : path_1.default.join(__dirname, "public");
+    ? path_1.default.join(__dirname, "public") // Simplesmente use __dirname/public para acessar o asset virtual
+    : path_1.default.join(__dirname, "public"); // Mantém igual para DEV (já que public está em dist/public)
 app.use(express_1.default.static(publicDir));
 // Endpoint com as informações do sistema
 app.get("/api/info", async (_req, res) => {
@@ -47,5 +50,7 @@ app.get("*", (_req, res) => {
 // Inicializa o servidor e abre o navegador
 app.listen(PORT, async () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
+    // Certifique-se de que tryOpenChromeOrDefault está lidando com o 'open' corretamente
+    // e que 'open' está instalado (já está em suas dependências).
     await (0, chromeLauncher_1.tryOpenChromeOrDefault)(`http://localhost:${PORT}`);
 });
